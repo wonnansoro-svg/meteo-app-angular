@@ -1,32 +1,46 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { JsonPipe } from '@angular/common'; // Pour afficher du JSON brut
+import { FormsModule } from '@angular/forms'; // <-- 1. Importation indispensable pour la recherche
 import { WeatherService } from './services/weather.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, JsonPipe],
+  imports: [RouterOutlet, FormsModule], // <-- 2. Ajout dans les imports
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App implements OnInit {
   protected readonly title = signal('meteo-app');
-  
-  // Signal pour stocker les données reçues
   weatherData = signal<any>(null); 
   
-  // Injection du service météo
+  // 3. Variable liée à notre barre de recherche
+  cityToSearch = 'Dakar'; 
+
   private weatherService = inject(WeatherService);
 
   ngOnInit() {
-    this.weatherService.getWeatherByCity('Dakar').subscribe({
-      // On ajoute ": any" à data
+    // Au démarrage, on cherche la ville par défaut
+    this.fetchWeather(this.cityToSearch);
+  }
+
+  // 4. Fonction centralisée pour faire l'appel API
+  fetchWeather(city: string) {
+    this.weatherData.set(null); // Optionnel: vide les données pour afficher le chargement
+    this.weatherService.getWeatherByCity(city).subscribe({
       next: (data: any) => {
-        console.log('Succès API:', data);
         this.weatherData.set(data);
       },
-      // On ajoute ": any" à err (ou : Error)
-      error: (err: any) => console.error('Erreur API:', err)
+      error: (err: any) => {
+        console.error('Erreur API:', err);
+        // (La gestion propre de cette erreur sera le but du Sprint 3 !)
+      }
     });
+  }
+
+  // 5. Fonction déclenchée par le bouton "Rechercher"
+  onSearch() {
+    if (this.cityToSearch.trim()) { // On vérifie que le champ n'est pas vide
+      this.fetchWeather(this.cityToSearch);
+    }
   }
 }
