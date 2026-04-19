@@ -16,3 +16,18 @@ export class WeatherService {
     return this.http.get(url);
   }
 }
+
+// ... imports existants
+
+@Injectable({
+  providedIn: 'root'
+})
+export class WeatherService {
+  // ... propriétés existantes
+
+  // Nouvelle méthode pour les prévisions sur 5 jours
+  getForecastByCity(city: string): Observable<any> {
+    const url = `${this.apiUrl}/forecast?q=${city},SN&appid=${this.apiKey}&units=metric&lang=fr`;
+    return this.http.get(url);
+  }
+}

@@ -55,6 +55,31 @@
         </div>
 
       </div>
+      @if (forecastData()) {
+      <div class="mt-5">
+        <h4 class="text-center mb-4 fw-bold">📅 Prévisions à 5 jours (Midi)</h4>
+        <div class="row row-cols-2 row-cols-md-5 g-3 justify-content-center">
+          
+          @for (day of forecastData(); track day.dt) {
+            <div class="col">
+              <div class="card h-100 border-0 shadow-sm text-center py-3" style="border-radius: 15px;">
+                <p class="small text-muted mb-1">
+                  {{ day.dt_txt | date:'EEEE' : '' : 'fr' }}
+                </p>
+                <img 
+                  [src]="'https://openweathermap.org/img/wn/' + day.weather[0].icon + '.png'" 
+                  class="mx-auto" style="width: 50px;"
+                  alt="icon"
+                >
+                <p class="fw-bold mb-0">{{ day.main.temp | number:'1.0-0' }}°C</p>
+                <p class="small text-capitalize text-truncate px-2">{{ day.weather[0].description }}</p>
+              </div>
+            </div>
+          }
+
+        </div>
+      </div>
+    }
     </div>
   }
   @else if (!errorMessage()) {

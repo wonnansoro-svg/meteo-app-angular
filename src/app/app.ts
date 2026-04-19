@@ -23,25 +23,48 @@ export class App implements OnInit {
     this.fetchWeather(this.cityToSearch);
   }
 
-  fetchWeather(city: string) {
-    this.weatherData.set(null); 
-    this.errorMessage.set(null); // 2. On efface les anciennes erreurs à chaque recherche
+  // ... imports existants
 
+export class App implements OnInit {
+  // ... signaux existants
+  forecastData = signal<any>(null); // Pour stocker les prévisions
+
+  // ... inject, etc.
+
+  fetchWeather(city: string) {
+    this.weatherData.set(null);
+    this.forecastData.set(null); // On réinitialise aussi les prévisions
+    this.errorMessage.set(null);
+
+    // 1. Appel météo actuelle
     this.weatherService.getWeatherByCity(city).subscribe({
+      next: (data: any) => this.weatherData.set(data),
+      error: (err: any) => this.handleError(err, city)
+    });
+
+    // 2. Appel prévisions
+    this.weatherService.getForecastByCity(city).subscribe({
       next: (data: any) => {
-        this.weatherData.set(data);
+        // On ne garde que 5 résultats (par exemple un par jour à midi)
+        // L'API renvoie 40 points (8 par jour). On filtre pour simplifier :
+        const dailyForecast = data.list.filter((f: any) => f.dt_txt.includes("12:00:00"));
+        this.forecastData.set(dailyForecast);
       },
-      error: (err: any) => {
-        console.error('Erreur API:', err);
-        // 3. On vérifie le type d'erreur renvoyé par l'API
-        if (err.status === 404) {
-          this.errorMessage.set(`Oups ! La ville "${city}" est introuvable. Vérifiez l'orthographe.`);
-        } else {
-          this.errorMessage.set("Problème de réseau ou erreur de l'API. Veuillez réessayer plus tard.");
-        }
-      }
+      error: (err: any) => console.error('Erreur prévisions:', err)
     });
   }
+
+  // Petite fonction utilitaire pour l'erreur
+  private handleError(err: any, city: string) {
+    if (err.status === 404) {
+      this.errorMessage.set(`La ville "${city}" est introuvable.`);
+    } else {
+      this.errorMessage.set("Erreur de connexion à l'API.");
+    }
+  }
+  
+  // ... reste du code
+}
 
   onSearch() {
     if (this.cityToSearch.trim()) {
