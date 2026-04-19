@@ -17,6 +17,12 @@
       </div>
     </div>
   </div>
+         
+  @if (errorMessage()) {
+    <div class="alert alert-danger text-center mx-auto shadow-sm" style="max-width: 400px;" role="alert">
+      ⚠️ <strong>Erreur :</strong> {{ errorMessage() }}
+    </div>
+  }
 
   @if (weatherData()) {
     <div class="card mx-auto shadow-lg border-0" style="max-width: 400px; border-radius: 20px;">
@@ -50,7 +56,8 @@
 
       </div>
     </div>
-  } @else {
+  }
+  @else if (!errorMessage()) {
     <div class="d-flex justify-content-center mt-5">
       <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
         <span class="visually-hidden">Chargement...</span>
