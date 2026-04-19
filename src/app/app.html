@@ -1,94 +1,63 @@
-<div class="container py-5">
-  <h1 class="text-center text-primary mb-4">🌦️ {{ title() }}</h1>
+import { Component, signal, inject, OnInit } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common'; <!--  Ajout obligatoire pour utiliser "date" dans le  -->
+import { WeatherService } from './services/weather.service';
 
-  <div class="row justify-content-center mb-4">
-    <div class="col-md-8 col-lg-6">
-      <div class="input-group shadow-sm">
-        <input 
-          type="text" 
-          class="form-control form-control-lg" 
-          placeholder="Entrez une ville (ex: Thiès, Saint-Louis...)" 
-          [(ngModel)]="cityToSearch" 
-          (keyup.enter)="onSearch()"
-        >
-        <button class="btn btn-primary px-4" type="button" (click)="onSearch()">
-          🔍 Rechercher
-        </button>
-      </div>
-    </div>
-  </div>
-         
-  @if (errorMessage()) {
-    <div class="alert alert-danger text-center mx-auto shadow-sm" style="max-width: 400px;" role="alert">
-      ⚠️ <strong>Erreur :</strong> {{ errorMessage() }}
-    </div>
+@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet, FormsModule, CommonModule],
+  templateUrl: './app.html',
+  styleUrl: './app.css'
+})
+export class App implements OnInit {
+  protected readonly title = signal('meteo-app');
+  
+  weatherData = signal<any>(null); 
+  forecastData = signal<any>(null);
+  cityToSearch = 'Dakar'; 
+  errorMessage = signal<string | null>(null);
+
+  private weatherService = inject(WeatherService);
+
+  ngOnInit() {
+    this.fetchWeather(this.cityToSearch);
   }
 
-  @if (weatherData()) {
-    <div class="card mx-auto shadow-lg border-0" style="max-width: 400px; border-radius: 20px;">
-      <div class="card-body text-center" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); border-radius: 20px;">
-        
-        <h2 class="card-title text-uppercase fw-bold mt-2">{{ weatherData().name }}</h2>
-        
-        <img 
-          [src]="'https://openweathermap.org/img/wn/' + weatherData().weather[0].icon + '@4x.png'" 
-          alt="Icône météo"
-          class="bg-info bg-opacity-25 rounded-circle shadow-sm my-3"
-          style="width: 130px; height: 130px; object-fit: cover;"
-        >
-        
-        <h3 class="display-4 fw-bold text-dark mb-0">{{ weatherData().main.temp }} °C</h3>
-        
-        <p class="text-muted text-capitalize fs-5 mt-2">{{ weatherData().weather[0].description }}</p>
-        
-        <hr class="my-4">
-        
-        <div class="d-flex justify-content-around">
-          <div>
-            <p class="mb-1 text-muted small text-uppercase">Humidité</p>
-            <p class="fw-bold fs-5 mb-0 text-primary">💧 {{ weatherData().main.humidity }}%</p>
-          </div>
-          <div>
-            <p class="mb-1 text-muted small text-uppercase">Vent</p>
-            <p class="fw-bold fs-5 mb-0 text-primary">💨 {{ weatherData().wind.speed }} m/s</p>
-          </div>
-        </div>
+  fetchWeather(city: string) {
+    this.weatherData.set(null); 
+    this.forecastData.set(null);
+    this.errorMessage.set(null);
 
-      </div>
-      @if (forecastData()) {
-      <div class="mt-5">
-        <h4 class="text-center mb-4 fw-bold">📅 Prévisions à 5 jours (Midi)</h4>
-        <div class="row row-cols-2 row-cols-md-5 g-3 justify-content-center">
-          
-          @for (day of forecastData(); track day.dt) {
-            <div class="col">
-              <div class="card h-100 border-0 shadow-sm text-center py-3" style="border-radius: 15px;">
-                <p class="small text-muted mb-1">
-                  {{ day.dt_txt | date:'EEEE' : '' : 'fr' }}
-                </p>
-                <img 
-                  [src]="'https://openweathermap.org/img/wn/' + day.weather[0].icon + '.png'" 
-                  class="mx-auto" style="width: 50px;"
-                  alt="icon"
-                >
-                <p class="fw-bold mb-0">{{ day.main.temp | number:'1.0-0' }}°C</p>
-                <p class="small text-capitalize text-truncate px-2">{{ day.weather[0].description }}</p>
-              </div>
-            </div>
-          }
+    // Appel Météo Actuelle
+    this.weatherService.getWeatherByCity(city).subscribe({
+      next: (data: any) => {
+        this.weatherData.set(data);
+      },
+      error: (err: any) => {
+        console.error('Erreur API:', err);
+        if (err.status === 404) {
+          this.errorMessage.set(`Oups ! La ville "${city}" est introuvable. Vérifiez l'orthographe.`);
+        } else {
+          this.errorMessage.set("Problème de réseau ou erreur de l'API. Veuillez réessayer plus tard.");
+        }
+      }
+    });
 
-        </div>
-      </div>
+    // Appel Prévisions
+    this.weatherService.getForecastByCity(city).subscribe({
+      next: (data: any) => {
+        
+        const dailyForecast = data.list.filter((f: any) => f.dt_txt.includes("12:00:00"));
+        this.forecastData.set(dailyForecast);
+      },
+      error: (err: any) => console.error('Erreur prévisions:', err)
+    });
+  }
+
+  onSearch() {
+    if (this.cityToSearch.trim()) {
+      this.fetchWeather(this.cityToSearch);
     }
-    </div>
   }
-  @else if (!errorMessage()) {
-    <div class="d-flex justify-content-center mt-5">
-      <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-        <span class="visually-hidden">Chargement...</span>
-      </div>
-    </div>
-  }
-</div>
-
-<router-outlet></router-outlet>
+}
