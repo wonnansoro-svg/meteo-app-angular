@@ -1,5 +1,5 @@
 <div style="
-  background-image: src="image/background.jpg";
+  background-image: url('https://images.unsplash.com/photo-1476610182048-b716b8518aae?q=80&w=1920&auto=format&fit=crop'); /* Paysage naturel et lumière dorée */
   background-size: cover;       
   background-position: center;  
   background-repeat: no-repeat; 
@@ -8,102 +8,109 @@
   width: 100%;                  
 ">
   
-  <div class="container py-5">
-    
-    <h1 class="text-center text-white mb-4 fw-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">
-      🌦️ {{ title() }}
-    </h1>
-
-    <div class="row justify-content-center mb-4">
-      <div class="col-md-8 col-lg-6">
-        <div class="input-group shadow-sm">
-          <input 
-            type="text" 
-            class="form-control form-control-lg" 
-            placeholder="Entrez une ville (ex: Thiès, Saint-Louis...)" 
-            [(ngModel)]="cityToSearch" 
-            (keyup.enter)="onSearch()"
-          >
-          <button class="btn btn-primary px-4" type="button" (click)="onSearch()">
-            🔍 Rechercher
-          </button>
-        </div>
-      </div>
-    </div>
-           
-    @if (errorMessage()) {
-      <div class="alert alert-danger text-center mx-auto shadow-sm" style="max-width: 400px;" role="alert">
-        ⚠️ <strong>Erreur :</strong> {{ errorMessage() }}
-      </div>
-    }
-
-    @if (weatherData()) {
+  <div style="background-color: rgba(0, 0, 0, 0.2); min-height: 100vh; width: 100%;" class="py-5">
+    <div class=\"container\">
       
-      <div class="card mx-auto shadow-lg border-0 mb-4" style="max-width: 400px; border-radius: 20px;">
-        <div class="card-body text-center" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); border-radius: 20px;">
-          
-          <h2 class="card-title text-uppercase fw-bold mt-2">{{ weatherData().name }}</h2>
-          
-          <img 
-            [src]="'https://openweathermap.org/img/wn/' + weatherData().weather[0].icon + '@4x.png'" 
-            alt="Icône météo"
-            class="bg-info bg-opacity-25 rounded-circle shadow-sm my-3"
-            style="width: 130px; height: 130px; object-fit: cover;"
-          >
-          
-          <h3 class="display-4 fw-bold text-dark mb-0">{{ weatherData().main.temp }} °C</h3>
-          
-          <p class="text-muted text-capitalize fs-5 mt-2">{{ weatherData().weather[0].description }}</p>
-          
-          <hr class="my-4">
-          
-          <div class="d-flex justify-content-around">
-            <div>
-              <p class="mb-1 text-muted small text-uppercase">Humidité</p>
-              <p class="fw-bold fs-5 mb-0 text-primary">💧 {{ weatherData().main.humidity }}%</p>
-            </div>
-            <div>
-              <p class="mb-1 text-muted small text-uppercase">Vent</p>
-              <p class="fw-bold fs-5 mb-0 text-primary">💨 {{ weatherData().wind.speed }} m/s</p>
-            </div>
-          </div>
+      <h1 class="text-center text-white mb-4 fw-light" style="letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+        🌤️ {{ title() }}
+      </h1>
 
+      <div class="row justify-content-center mb-4">
+        <div class="col-md-8 col-lg-6">
+          <div class="input-group shadow-sm" style="border-radius: 30px; overflow: hidden;">
+            <input 
+              type="text" 
+              class="form-control form-control-lg border-0" 
+              placeholder="Où êtes-vous ? (ex: Dakar, Thiès...)" 
+              [(ngModel)]="cityToSearch" 
+              (keyup.enter)="onSearch()"
+              style="background-color: rgba(255, 250, 245, 0.95); color: #5d4037;"
+            >
+            <button class="btn px-4 text-white" type="button" (click)="onSearch()" style="background-color: #d35400; border: none;">
+              🔍 Chercher
+            </button>
+          </div>
         </div>
       </div>
-      @if (forecastData()) {
-        <div class="mt-5">
-          <h4 class="text-center mb-4 fw-bold text-white" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">📅 Prévisions à 5 jours (Midi)</h4>
-          <div class="row row-cols-2 row-cols-md-5 g-3 justify-content-center">
             
-            @for (day of forecastData(); track day.dt) {
-              <div class="col">
-                <div class="card h-100 border-0 shadow-sm text-center py-3 bg-white bg-opacity-75" style="border-radius: 15px;">
-                  <p class="small text-muted mb-1 text-capitalize">
-                    {{ day.dt_txt | date:'EEEE' }}
-                  </p>
-                  <img 
-                    [src]="'https://openweathermap.org/img/wn/' + day.weather[0].icon + '.png'" 
-                    class="mx-auto" style="width: 50px;"
-                    alt="icon"
-                  >
-                  <p class="fw-bold mb-0 text-dark">{{ day.main.temp | number:'1.0-0' }}°C</p>
-                  <p class="small text-capitalize text-truncate px-2 text-dark">{{ day.weather[0].description }}</p>
-                </div>
+      @if (errorMessage()) {
+        <div class="alert text-center mx-auto shadow-sm" style="max-width: 400px; background-color: #ffeaa7; color: #d63031; border: none; border-radius: 15px;" role="alert">
+          🪴 <strong>Mince :</strong> {{ errorMessage() }}
+        </div>
+      }
+
+      @if (weatherData()) {
+        
+        <div class="card mx-auto shadow-lg border-0 mb-4" style="max-width: 400px; border-radius: 25px; background: rgba(255, 251, 245, 0.92); backdrop-filter: blur(5px);">
+          <div class="card-body text-center p-4">
+            
+            <h2 class="card-title fw-bold mt-2" style="color: #4a4a4a; letter-spacing: 1px;">{{ weatherData().name }}</h2>
+            
+            <div class="mx-auto rounded-circle shadow-sm my-3 d-flex align-items-center justify-content-center" style="background-color: rgba(253, 203, 110, 0.3); width: 140px; height: 140px;">
+              <img 
+                [src]="'https://openweathermap.org/img/wn/' + weatherData().weather[0].icon + '@4x.png'" 
+                alt="Icône météo"
+                style="width: 120px; height: 120px; object-fit: cover;"
+              >
+            </div>
+            
+            <h3 class="display-3 fw-bold mb-0" style="color: #2d3436;">{{ weatherData().main.temp }}°</h3>
+            
+            <p class="text-capitalize fs-5 mt-2 mb-4" style="color: #877164;">{{ weatherData().weather[0].description }}</p>
+            
+            <div class="d-flex justify-content-around py-3" style="background-color: rgba(0,0,0,0.03); border-radius: 15px;">
+              <div>
+                <p class="mb-1 small text-uppercase" style="color: #a08c82; letter-spacing: 1px;">Humidité</p>
+                <p class="fw-bold fs-5 mb-0" style="color: #cd6133;">💧 {{ weatherData().main.humidity }}%</p>
               </div>
-            }
+              <div>
+                <p class="mb-1 small text-uppercase" style="color: #a08c82; letter-spacing: 1px;">Vent</p>
+                <p class="fw-bold fs-5 mb-0" style="color: #cd6133;">💨 {{ weatherData().wind.speed }} m/s</p>
+              </div>
+            </div>
 
           </div>
         </div>
-      }
-      }
-    @else if (!errorMessage()) {
-      <div class="d-flex justify-content-center mt-5">
-        <div class="spinner-border text-white" role="status" style="width: 3rem; height: 3rem;">
-          <span class="visually-hidden">Chargement...</span>
-        </div>
-      </div>
-    }
-  </div>
 
-  <router-outlet></router-outlet>
+        @if (forecastData()) {
+          <div class="mt-5">
+            <h4 class="text-center mb-4 fw-light text-white" style="letter-spacing: 1px; text-shadow: 1px 1px 3px rgba(0,0,0,0.6);">
+              Les prochains jours
+            </h4>
+            <div class="row row-cols-2 row-cols-md-5 g-3 justify-content-center">
+              
+              @for (day of forecastData(); track day.dt) {
+                <div class="col">
+                  <div class="card h-100 border-0 shadow-sm text-center py-3" style="border-radius: 20px; background: rgba(255, 251, 245, 0.85); backdrop-filter: blur(5px);">
+                    <p class="small mb-1 text-capitalize fw-bold" style="color: #877164;">
+                      {{ day.dt_txt | date:'EEEE' }}
+                    </p>
+                    <img 
+                      [src]="'https://openweathermap.org/img/wn/' + day.weather[0].icon + '.png'" 
+                      class="mx-auto" style="width: 60px;"
+                      alt="icon"
+                    >
+                    <p class="fs-5 fw-bold mb-0" style="color: #4a4a4a;">{{ day.main.temp | number:'1.0-0' }}°</p>
+                    <p class="small text-capitalize text-truncate px-2 mt-1 mb-0" style="color: #a08c82;">{{ day.weather[0].description }}</p>
+                  </div>
+                </div>
+              }
+
+            </div>
+          </div>
+        }
+
+      }
+      @else if (!errorMessage()) {
+        <div class="d-flex justify-content-center mt-5">
+          <div class="spinner-border" style="color: #f39c12; width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Chargement...</span>
+          </div>
+        </div>
+      }
+      
+    </div>
+  </div>
 </div>
+
+<router-outlet></router-outlet>
