@@ -1,7 +1,7 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common'; <!--  Ajout obligatoire pour utiliser "date" dans le  -->
+import { CommonModule } from '@angular/common';
 import { WeatherService } from './services/weather.service';
 
 @Component({
@@ -47,7 +47,6 @@ export class App implements OnInit {
     // Appel Prévisions
     this.weatherService.getForecastByCity(city).subscribe({
       next: (data: any) => {
-        
         const dailyForecast = data.list.filter((f: any) => f.dt_txt.includes("12:00:00"));
         this.forecastData.set(dailyForecast);
       },
