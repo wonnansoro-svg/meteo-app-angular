@@ -19,13 +19,14 @@ export class App implements OnInit {
   private weatherService = inject(WeatherService);
 
   ngOnInit() {
-    // Appel à l'API pour la ville de Dakar au démarrage
     this.weatherService.getWeatherByCity('Dakar').subscribe({
-      next: (data) => {
+      // On ajoute ": any" à data
+      next: (data: any) => {
         console.log('Succès API:', data);
         this.weatherData.set(data);
       },
-      error: (err) => console.error('Erreur API:', err)
+      // On ajoute ": any" à err (ou : Error)
+      error: (err: any) => console.error('Erreur API:', err)
     });
   }
 }
